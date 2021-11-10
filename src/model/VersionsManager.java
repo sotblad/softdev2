@@ -30,24 +30,8 @@ public class VersionsManager {
 		enabled = false;
 	}
 	
-	public void setCurrentVersion(Document document) {
-		latexEditorView.setCurrentDocument(document);
-	}
-
-	public String getType() {
-		return latexEditorView.getType();
-	}
-
-	public void saveContents() {
-		latexEditorView.saveContents();
-	}
-
-	public void saveToFile() {
-		latexEditorView.saveToFile();
-	}
-
-	public void loadFromFile() {
-		latexEditorView.loadFromFile();
+	public LatexEditorView getEditorView() {
+		return latexEditorView;
 	}
 
 	public void enableStrategy() {

@@ -15,7 +15,7 @@ public class AddLatexCommand implements Command  {
 	@Override
 	public void execute() {
 		// TODO Auto-generated method stub
-		versionsManager.saveContents();
+		versionsManager.getEditorView().saveContents();
 	}
 
 }

@@ -21,7 +21,7 @@ public class LoadCommand implements Command {
 	@Override
 	public void execute() {
 		// TODO Auto-generated method stub
-		versionsManager.loadFromFile();
+		versionsManager.getEditorView().loadFromFile();
 	}
 
 }
