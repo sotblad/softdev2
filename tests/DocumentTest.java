@@ -65,7 +65,7 @@ class DocumentTest {
 		latexEditorView.setStrategy(defaultStrategy);
 		latexEditorView.getController().enact("enableVersionsManagement");
 		
-		assertEquals(versionsManager.isEnabled(), true);
+		assertEquals(latexEditorView.getVersionsManager().isEnabled(), true);
 	}
 	
 	@Test
@@ -85,7 +85,7 @@ class DocumentTest {
 		latexEditorView.getController().enact("enableVersionsManagement");
 		latexEditorView.getController().enact("disableVersionsManagement");
 		
-		assertEquals(versionsManager.isEnabled(), false);
+		assertEquals(latexEditorView.getVersionsManager().isEnabled(), false);
 	}
 	
 	@Test
@@ -117,7 +117,7 @@ class DocumentTest {
 	@Test
 	void saveDocumentToPath() { // US-8 -- ✅
 		String template = "bookTemplate";
-		String docSavePath = "C:/Users/Sot/Desktop/test.txt";
+		String docSavePath = "test.txt";
 		File file = new File(docSavePath);
 		latexEditorView.setType(template);
 		latexEditorView.getController().enact("create");
@@ -129,7 +129,7 @@ class DocumentTest {
 	
 	@Test
 	void loadDocumentFromDisk() { // US-9 -- ✅
-		String filePath = "C:/Users/Sot/Desktop/test.txt";
+		String filePath = "test.txt";
 		File file = new File(filePath);
 		latexEditorView.setFilename(filePath);
 		if(file.exists()) {

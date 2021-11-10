@@ -12,6 +12,7 @@ public class LatexEditorController{
 	private HashMap<String, Command> commands;
 	
 	public LatexEditorController(VersionsManager versionsManager) {
+		Singleton app = Singleton.getInstance(versionsManager);
 		CommandFactory commandFactory = new CommandFactory(versionsManager);
 		commands = new HashMap<String, Command>();
 		
