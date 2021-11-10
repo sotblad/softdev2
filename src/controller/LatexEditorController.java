@@ -30,7 +30,8 @@ public class LatexEditorController{
 		);
 
 		for(int i = 0; i < commandsList.size(); i++) {
-			commands.put(commandsList.get(i), commandFactory.createCommand(commandsList.get(i)));
+			String command = commandsList.get(i);
+			commands.put(command, commandFactory.createCommand(command));
 		}
 		
 	}
