@@ -1,5 +1,6 @@
 package controller.commands;
 
+import model.Document;
 import model.VersionsManager;
 
 public class EditCommand implements Command {
@@ -11,11 +12,20 @@ public class EditCommand implements Command {
 		this.versionsManager = versionsManager;
 	}
 
-
+	public void saveContents() {
+		Document currentDocument = versionsManager.getEditorView().getCurrentDocument();
+		String text = versionsManager.getEditorView().getText();
+		
+		if(versionsManager.isEnabled()) {
+			versionsManager.putVersion(currentDocument);
+			currentDocument.changeVersion();
+		}
+		currentDocument.setContents(text);
+	}
+	
 	@Override
 	public void execute() {
-		// TODO Auto-generated method stub
-		versionsManager.getEditorView().saveContents();
+		saveContents();
 	}
 
 }

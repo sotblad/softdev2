@@ -1,5 +1,6 @@
 package controller.commands;
 
+import model.Document;
 import model.VersionsManager;
 
 public class AddLatexCommand implements Command  {
@@ -11,11 +12,10 @@ public class AddLatexCommand implements Command  {
 		this.versionsManager = versionsManager;
 	}
 
-
 	@Override
 	public void execute() {
-		// TODO Auto-generated method stub
-		versionsManager.getEditorView().saveContents();
+		EditCommand editCommandObj = new EditCommand(versionsManager);
+		editCommandObj.saveContents();
 	}
 
 }
