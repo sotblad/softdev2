@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import controller.LatexEditorController;
+import controller.Singleton;
 import model.Document;
 import model.DocumentManager;
 import model.VersionsManager;
@@ -19,12 +20,15 @@ class DocumentTest {
 	private LatexEditorView latexEditorView = new LatexEditorView();
 	private VersionsManager versionsManager = new VersionsManager(strategy, latexEditorView);
 	private LatexEditorController controller = new LatexEditorController(versionsManager);
+	private Singleton app;
 	private String defaultStrategy = "volatile";
 	private Document document;
 	
 	@BeforeEach
 	void init() {
 		document = new Document();
+		app = Singleton.getInstance(versionsManager, documentManager);
+		app.destroyMe();
 		latexEditorView.setCurrentDocument(document);
 		latexEditorView.setVersionsManager(versionsManager);
 		latexEditorView.setController(controller);

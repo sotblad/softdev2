@@ -4,16 +4,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import controller.Singleton;
 import model.Document;
 import model.VersionsManager;
 
 public class LoadCommand implements Command {
-	private VersionsManager versionsManager;
+	private VersionsManager versionsManager = Singleton.versionsManager;
 	
-	public LoadCommand(VersionsManager versionsManager) {
-		super();
-		this.versionsManager = versionsManager;
-	}
+	public LoadCommand() {}
 
 	public VersionsManager getVersionsManager() {
 		return versionsManager;

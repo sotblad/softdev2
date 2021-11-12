@@ -4,16 +4,15 @@ import java.util.HashMap;
 
 import javax.swing.JEditorPane;
 
+import controller.Singleton;
 import model.VersionsManager;
 import view.LatexEditorView;
 
 public class AddLatexCommand implements Command  {
-	private VersionsManager versionsManager;
+	private VersionsManager versionsManager = Singleton.versionsManager;
 	private HashMap<String, String> commandsContentsList = new HashMap<String, String>();
 	
-	public AddLatexCommand(VersionsManager versionsManager) {
-		super();
-		this.versionsManager = versionsManager;
+	public AddLatexCommand() {
 		commandsContentsList.put("chapter", "\\n\\\\chapter{...}");
 		commandsContentsList.put("section", "\\n\\\\section{...}");
 		commandsContentsList.put("subsection", "\\n\\\\subsection{...}");

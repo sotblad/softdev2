@@ -6,14 +6,16 @@ import java.util.List;
 
 import controller.commands.Command;
 import controller.commands.CommandFactory;
+import model.DocumentManager;
 import model.VersionsManager;
 
 public class LatexEditorController{
 	private HashMap<String, Command> commands;
 	
 	public LatexEditorController(VersionsManager versionsManager) {
-		Singleton app = Singleton.getInstance(versionsManager);
-		CommandFactory commandFactory = new CommandFactory(versionsManager);
+		DocumentManager documentManager = new DocumentManager();
+		Singleton.getInstance(versionsManager, documentManager); // initialize Singleton Instance
+		CommandFactory commandFactory = new CommandFactory();
 		commands = new HashMap<String, Command>();
 		
 		List<String> commandsList = Arrays.asList(
@@ -34,7 +36,6 @@ public class LatexEditorController{
 			String command = commandsList.get(i);
 			commands.put(command, commandFactory.createCommand(command));
 		}
-		
 	}
 	
 	public void enact(String command) {

@@ -1,19 +1,15 @@
 package controller.commands;
 
+import controller.Singleton;
 import model.VersionsManager;
 
 public class EnableVersionsManagementCommand implements Command {
-	private VersionsManager versionsManager;
+	private VersionsManager versionsManager = Singleton.versionsManager;
 	
-	public EnableVersionsManagementCommand(VersionsManager versionsManager) {
-		super();
-		this.versionsManager = versionsManager;
-	}
-
+	public EnableVersionsManagementCommand() {}
 
 	@Override
 	public void execute() {
-		// TODO Auto-generated method stub
 		versionsManager.enableStrategy();
 	}
 

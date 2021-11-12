@@ -1,49 +1,35 @@
 package controller.commands;
 
-import java.util.HashMap;
-
-import model.DocumentManager;
-import model.VersionsManager;
-
 public class CommandFactory {
-	private DocumentManager documentManager;
-	private VersionsManager versionsManager;
-	
-	
-	public CommandFactory(VersionsManager versionsManager) {
-		super();
-		this.versionsManager = versionsManager;
-		documentManager = new DocumentManager();
-	}
-
+	public CommandFactory() {}
 
 	public Command createCommand(String type) {
 		if(type.equals("addLatex")) {
-			return new AddLatexCommand(versionsManager);
+			return new AddLatexCommand();
 		}
 		if(type.equals("changeVersionsStrategy")) {
-			return new ChangeVersionsStrategyCommand(versionsManager);
+			return new ChangeVersionsStrategyCommand();
 		}
 		if(type.equals("create")) {
-			return new CreateCommand(documentManager, versionsManager);
+			return new CreateCommand();
 		}
 		if(type.equals("disableVersionsManagement")) {
-			return new DisableVersionsManagementCommand(versionsManager);
+			return new DisableVersionsManagementCommand();
 		}
 		if(type.equals("edit")) {
-			return new EditCommand(versionsManager);
+			return new EditCommand();
 		}
 		if(type.equals("enableVersionsManagement")) {
-			return new EnableVersionsManagementCommand(versionsManager);
+			return new EnableVersionsManagementCommand();
 		}
 		if(type.equals("load")) {
-			return new LoadCommand(versionsManager);
+			return new LoadCommand();
 		}
 		if(type.equals("rollbackToPreviousVersion")) {
-			return new RollbackToPreviousVersionCommand(versionsManager);
+			return new RollbackToPreviousVersionCommand();
 		}
 		if(type.equals("save")) {
-			return new SaveCommand(versionsManager);
+			return new SaveCommand();
 		}
 		return null;
 	}

@@ -1,15 +1,13 @@
 package controller.commands;
 
+import controller.Singleton;
 import model.Document;
 import model.VersionsManager;
 
 public class SaveCommand implements Command {
-	private VersionsManager versionsManager;
+	private VersionsManager versionsManager = Singleton.versionsManager;
 	
-	public SaveCommand(VersionsManager versionsManager) {
-		// TODO Auto-generated constructor stub
-		this.versionsManager = versionsManager;
-	}
+	public SaveCommand() {}
 	
 	public void saveToFile() {
 		Document currentDocument = versionsManager.getEditorView().getCurrentDocument();
