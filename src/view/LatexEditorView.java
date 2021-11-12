@@ -1,8 +1,6 @@
 package view;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
+import javax.swing.JEditorPane;
 
 import controller.LatexEditorController;
 import model.Document;
@@ -16,9 +14,18 @@ public class LatexEditorView {
 	private String filename;
 	private String strategy;
 	private VersionsManager versionsManager;
+	private JEditorPane editorPane;
 	
 	public VersionsManager getVersionsManager() {
 		return versionsManager;
+	}
+	
+	public JEditorPane getEditorPane() {
+		return editorPane;
+	}
+	
+	public void setEditorPane(JEditorPane editorPane) {
+		this.editorPane = editorPane;
 	}
 	
 	public void setVersionsManager(VersionsManager versionsManager) {

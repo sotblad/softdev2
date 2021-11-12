@@ -1,15 +1,60 @@
 package controller.commands;
 
-import model.Document;
+import java.util.HashMap;
+
+import javax.swing.JEditorPane;
+
 import model.VersionsManager;
+import view.LatexEditorView;
 
 public class AddLatexCommand implements Command  {
 	private VersionsManager versionsManager;
-	
+	private HashMap<String, String> commandsContentsList = new HashMap<String, String>();
 	
 	public AddLatexCommand(VersionsManager versionsManager) {
 		super();
 		this.versionsManager = versionsManager;
+		commandsContentsList.put("chapter", "\\n\\\\chapter{...}");
+		commandsContentsList.put("section", "\\n\\\\section{...}");
+		commandsContentsList.put("subsection", "\\n\\\\subsection{...}");
+		commandsContentsList.put("subsubsection", "\\n\\\\subsubsection{...}");
+		commandsContentsList.put("enumerate", "\\begin{enumerate}\n"+
+						"\\item ...\n"+
+						"\\item ...\n"+
+						"\\end{enumerate}\n");
+		commandsContentsList.put("itemize", "\\begin{itemize}\n"+
+						"\\item ...\n"+
+						"\\item ...\n"+
+						"\\end{itemize}\n");
+		commandsContentsList.put("table", "\\begin{table}\n"+
+					"\\caption{....}\\label{...}\n"+
+					"\\begin{tabular}{|c|c|c|}\n"+
+					"\\hline\n"+
+					"... &...&...\\\\\n"+
+					"... &...&...\\\\\n"+
+					"... &...&...\\\\\n"+
+					"\\hline\n"+
+					"\\end{tabular}\n"+
+					"\\end{table}\n");
+		commandsContentsList.put("figure","\\begin{figure}\n"+
+					"\\includegraphics[width=...,height=...]{...}\n"+
+					"\\caption{....}\\label{...}\n"+
+					"\\end{figure}\n");
+	}
+	
+	public void editContents(String type) {
+		LatexEditorView latexEditorView = versionsManager.getEditorView();
+		JEditorPane editorPane = latexEditorView.getEditorPane();
+		String contents = editorPane.getText();
+		String before = contents.substring(0, editorPane.getCaretPosition());
+		String after = contents.substring(editorPane.getCaretPosition());
+		
+		if(commandsContentsList.containsKey(type)) {
+			contents = before + commandsContentsList.get(type) +after;
+		}
+		latexEditorView.setText(contents);
+		latexEditorView.getController().enact("addLatex");
+		editorPane.setText(contents);
 	}
 
 	@Override

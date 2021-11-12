@@ -6,6 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JLabel;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -108,7 +110,8 @@ public class ChooseTemplate {
 				}
 
 				latexEditorView.getController().enact("create");
-				MainWindow mainWindow = new MainWindow(latexEditorView);
+				JEditorPane editorPane = new JEditorPane();
+				MainWindow mainWindow = new MainWindow(latexEditorView, editorPane);
 				frame.dispose();
 			}
 		});
@@ -119,7 +122,8 @@ public class ChooseTemplate {
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(previous.equals("main")) {
-					MainWindow mainWindow = new MainWindow(latexEditorView);
+					JEditorPane editorPane = new JEditorPane();
+					MainWindow mainWindow = new MainWindow(latexEditorView, editorPane);
 					frame.dispose();
 				}
 				else {
