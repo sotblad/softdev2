@@ -58,7 +58,7 @@ public class AddLatexCommand implements Command  {
 
 	@Override
 	public void execute() {
-		EditCommand editCommandObj = new EditCommand(versionsManager);
+		EditCommand editCommandObj = new EditCommand();
 		editCommandObj.saveContents();
 	}
 

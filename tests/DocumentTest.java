@@ -28,7 +28,7 @@ class DocumentTest {
 	void init() {
 		document = new Document();
 		app = Singleton.getInstance(versionsManager, documentManager);
-		app.destroyMe();
+		app.destroyInstance(); // method used only on tests.
 		latexEditorView.setCurrentDocument(document);
 		latexEditorView.setVersionsManager(versionsManager);
 		latexEditorView.setController(controller);

@@ -24,7 +24,7 @@ public class Singleton {
     	return versionsManager;
     }
     
-    public void destroyMe(){
+    public void destroyInstance() { // only used on JUnit tests
     	   Singleton.instance = null;
-    	}
+    }
 }

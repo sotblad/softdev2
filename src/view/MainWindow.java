@@ -124,7 +124,7 @@ public class MainWindow {
 			mnCommands.setEnabled(false);
 		}
 		
-		AddLatexCommand addLatexCommandObj = new AddLatexCommand(latexEditorView.getVersionsManager());
+		AddLatexCommand addLatexCommandObj = new AddLatexCommand();
 
 		addChapter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
