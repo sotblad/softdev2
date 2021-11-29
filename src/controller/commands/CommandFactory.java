@@ -31,6 +31,9 @@ public class CommandFactory {
 		if(type.equals("save")) {
 			return new SaveCommand();
 		}
+		if(type.equals("saveAsHTML")) {
+			return new SaveAsHTMLCommand();
+		}
 		return null;
 	}
 }

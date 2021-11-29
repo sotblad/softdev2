@@ -28,7 +28,8 @@ public class LatexEditorController{
 						"enableVersionsManagement",
 						"load",
 						"rollbackToPreviousVersion",
-						"save"
+						"save",
+						"saveAsHTML"
 				}
 		);
 
