@@ -1,5 +1,6 @@
 package controller.commands;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,17 +18,25 @@ public class SaveAsHTMLCommand implements Command {
 	
 	private HashMap<String, String> LatexHTML = new HashMap<String, String>();
 	private HashMap<String, String> htmlDocument = new HashMap<String, String>();
+	private ArrayList<String> noClosingTags = new ArrayList<String>();
+	private ArrayList<String> toDelete = new ArrayList<String>();
+	private int titleStart = -1;
+	private int titleEnd = -1;
+	private int ChapterCount;
+	private int sectionCount;
 	
 	public SaveAsHTMLCommand() {
 		Date date = new Date();
 		LatexHTML.put("\\chapter", "<h1>");
 		LatexHTML.put("\\section", "<h2>");
+		LatexHTML.put("\\section*", "<h2>");
 		LatexHTML.put("\\subsection", "<h3>");
 		LatexHTML.put("\\subsubsection", "<h4>");
 		LatexHTML.put("\\paragraph", "<h5>");
 		LatexHTML.put("\\subparagraph", "<h5>");
 		LatexHTML.put("\\begin{enumerate}", "<ol>");
 		LatexHTML.put("\\begin{itemize}", "<ul>");
+		LatexHTML.put("\\begin{document}", "<ul>");
 		LatexHTML.put("\\item", "<li>");
 		LatexHTML.put("\\begin{description}", "<dl>");
 		LatexHTML.put("\\emph{text}", "<em>");
@@ -35,12 +44,22 @@ public class SaveAsHTMLCommand implements Command {
 		LatexHTML.put("\\textbf{text}", "<b>");
 		LatexHTML.put("\\texttt{text}", "<tt>");
 		LatexHTML.put("\\n", "<br>");
-		LatexHTML.put("\\title", "<title>");
+		LatexHTML.put("\\title", "<h2><center>");
 		LatexHTML.put("\\and", "&emsp;");
 		LatexHTML.put("\\date", "<p>");
 		LatexHTML.put("\\today", date.toString());
 		LatexHTML.put("\\author", "<p>");
+		LatexHTML.put("\\chapter", "<h1>");
+		LatexHTML.put("\\chapter*", "<h1>");
 		LatexHTML.put("\\begin", "<body>");
+		LatexHTML.put("\\maketitle", "</h2></center>"); // xwris close
+		
+		noClosingTags.add("\\maketitle");
+		noClosingTags.add("\\title");
+		
+		toDelete.add("\\mainmatter");
+		toDelete.add("\\backmatter");
+		toDelete.add("\\frontmatter");
 	}
 	
 	public String closingTag(String tag) {
@@ -56,14 +75,41 @@ public class SaveAsHTMLCommand implements Command {
 			FirstPart = line.substring(0, line.indexOf("{"));
 			SecondPart = line.substring(line.indexOf("{")+1, line.indexOf("}"));
 			ThirdPart = line.substring(line.indexOf("}")+1);
-
+			
 			if(LatexHTML.containsKey(FirstPart)) {
-				FirstPart = LatexHTML.get(FirstPart);
-				result = FirstPart + SecondPart + closingTag(FirstPart) + ThirdPart;
+				if(!noClosingTags.contains(FirstPart)) {
+					String extra = "";
+
+					if(FirstPart.equals("\\chapter")) {
+						if(ChapterCount != 0) {
+							extra = "Chapter " + ChapterCount + ": <br>";
+						}
+						ChapterCount++;
+					}else if(FirstPart.equals("\\section")) {
+						extra = sectionCount + " ";
+						sectionCount++;
+					}
+					FirstPart = LatexHTML.get(FirstPart);
+					result = FirstPart + extra + SecondPart + closingTag(FirstPart) + ThirdPart;
+				}else {
+					FirstPart = LatexHTML.get(FirstPart);
+					result = FirstPart + SecondPart + ThirdPart;
+				}
 			}else {
-				result = FirstPart + SecondPart + ThirdPart;
+				String fontSize = "";
+				if(line.contains("documentclass")) {
+					fontSize = line.substring(line.indexOf("[")+1, line.indexOf(","));
+					result = "<html><font style='font-size:"+fontSize+"'>";
+				}else {				
+					result = FirstPart + SecondPart + ThirdPart;
+				}
 			}
 		}else {
+			for(int i = 0;i<toDelete.size();i++) {
+				if(line.contains(toDelete.get(i))) {
+					return "";
+				}
+			}
 			return line;
 		}
 		return result;
@@ -73,6 +119,8 @@ public class SaveAsHTMLCommand implements Command {
 		LatexEditorView latexEditorView = versionsManager.getEditorView();
 		String documentContents = latexEditorView.getCurrentDocument().getContents();
 		String replace = documentContents.replace("\\n", "<br>");
+		ChapterCount = 0;
+		sectionCount = 1;
 		
 		Scanner scanner = new Scanner(replace);
 		String result = "";
