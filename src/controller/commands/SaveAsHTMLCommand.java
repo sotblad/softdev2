@@ -19,16 +19,18 @@ public class SaveAsHTMLCommand implements Command {
 	private HashMap<String, String> LatexHTML = new HashMap<String, String>();
 	private HashMap<String, String> htmlDocument = new HashMap<String, String>();
 	private ArrayList<String> noClosingTags = new ArrayList<String>();
-	private ArrayList<String> toDelete = new ArrayList<String>();
+	private ArrayList<String> tableContents = new ArrayList<String>();
 	private HashMap<String, String> begins = new HashMap<String, String>();
 	private int titleStart = -1;
 	private int titleEnd = -1;
 	private int ChapterCount;
 	private int sectionCount;
+	private int subsectionCount;
 	private boolean numberingEnabled = true;
 	private String letterSignature;
 	private String letterSignerAddress;
 	private boolean isLetter = false;
+	private boolean readTable = false;
 	private String letterDestination;
 	
 	public SaveAsHTMLCommand() {
@@ -40,7 +42,6 @@ public class SaveAsHTMLCommand implements Command {
 		LatexHTML.put("\\subsubsection", "<h4>");
 		LatexHTML.put("\\paragraph", "<h5>");
 		LatexHTML.put("\\subparagraph", "<h5>");
-		LatexHTML.put("\\begin{enumerate}", "<ol>");
 		LatexHTML.put("\\begin{itemize}", "<ul>");
 		LatexHTML.put("\\begin{document}", "<ul>");
 		LatexHTML.put("\\item", "<li>");
@@ -97,16 +98,36 @@ public class SaveAsHTMLCommand implements Command {
 						ChapterCount++;
 					}else if(FirstPart.equals("\\section")) {
 						extra = sectionCount + " ";
+						subsectionCount = 1;
 						sectionCount++;
 					}else if(FirstPart.equals("\\closing")) {
 						extra = LatexHTML.get(FirstPart) + SecondPart + "<br>" + letterSignature + "</p>";
 						return extra;
+					}else if(FirstPart.equals("\\subsection")) {
+						extra = sectionCount + "." + subsectionCount + " ";
+						subsectionCount++;
 					}else if(FirstPart.equals("\\begin")) {
 						if(SecondPart.equals("document")) {
 							result = "<body>";
 							return result;
 						}else if(SecondPart.equals("abstract")) {
 							result = "<center><h3>Abstract</h3></center>";
+							return result;
+						}else if(SecondPart.equals("tabular")) {
+							result = "<table style='border:1px solid black;'>";
+							readTable = true;
+							return result;
+						}else if(SecondPart.equals("center")) {
+							result = "<center>";
+							return result;
+						}else if(SecondPart.equals("figure")) {
+							result = "<div id='figure'>";
+							return result;
+						}else if(SecondPart.equals("itemize")) {
+							result = "<ul>";
+							return result;
+						}else if(SecondPart.equals("enumerate")) {
+							result = "<ol>";
 							return result;
 						}else if(SecondPart.equals("letter")) {
 							letterDestination = ThirdPart.substring(ThirdPart.indexOf("{")+1, ThirdPart.indexOf("}")) + "<p>";
@@ -121,11 +142,28 @@ public class SaveAsHTMLCommand implements Command {
 						}else if(SecondPart.equals("abstract")) {
 							result = "";
 							return result;
+						}else if(SecondPart.equals("tabular")) {
+							result = "</table>";
+							readTable = false;
+							return result;
+						}else if(SecondPart.equals("figure")) {
+							result = "</div>";
+							return result;
+						}else if(SecondPart.equals("center")) {
+							result = "</center>";
+							return result;
+						}else if(SecondPart.equals("itemize")) {
+							result = "</ul>";
+							return result;
+						}else if(SecondPart.equals("enumerate")) {
+							result = "</ol>";
+							return result;
 						}else if(SecondPart.equals("letter")) {
 							result = "</div>";
 							return result;
 						}
 					}
+					
 					FirstPart = LatexHTML.get(FirstPart);
 					result = FirstPart + extra + SecondPart + closingTag(FirstPart) + ThirdPart;
 				}else {
@@ -145,6 +183,17 @@ public class SaveAsHTMLCommand implements Command {
 				}else if(line.contains("signature")) {
 					letterSignature = SecondPart; 
 					return "";
+				}else if(line.contains("includegraphics")) {
+					String sizes = line.substring(line.indexOf("[")+1, line.indexOf("]"));
+					String[] widthHeight = sizes.split(",");
+					float width = Float.parseFloat(widthHeight[0].substring(widthHeight[0].indexOf("=")+1));
+					float height = Float.parseFloat(widthHeight[1].substring(widthHeight[1].indexOf("=")+1));
+					String imageLocation = line.substring(line.indexOf("]")+1);
+					imageLocation = (imageLocation.replace("{", "")).replace("}", "");
+					System.out.println(imageLocation);
+					
+					
+					return "<img src='" + imageLocation + "' width='" + width + "' height='" + height + "'>";
 				}else if(line.contains("\\address{")) {
 					letterSignerAddress = SecondPart + "<br>"; 
 					return "";
@@ -156,6 +205,8 @@ public class SaveAsHTMLCommand implements Command {
 			if(line.contains("backmatter")) {
 				numberingEnabled = false;
 				return "";
+			}else if(line.contains("tableofcontents")) {
+				return "";
 			} else if(line.contains("mainmatter")) {
 				ChapterCount = 1;
 				numberingEnabled = true;
@@ -165,6 +216,15 @@ public class SaveAsHTMLCommand implements Command {
 				return "";
 			}else if(line.contains("%") && line.substring(0, 1).equals("%")) {
 				return "<!-- " + line.substring(1) + " -->";
+			}else if(readTable) {
+				line  = line.replace("\\\\", "");
+				String[] parts = line.split("&");
+				result += "<tr style='border:1px solid black;'>";
+				for(int i = 0;i<parts.length;i++) {
+					result += "<td style='border:1px solid black;'>" + parts[i] + "</td>";
+				}
+				result += "</tr>";
+				return result;
 			}
 			return line;
 		}
@@ -182,6 +242,8 @@ public class SaveAsHTMLCommand implements Command {
 		isLetter = false;
 		letterSignerAddress = "";
 		letterDestination = "";
+		readTable = false;
+		subsectionCount = 1;
 		
 		Scanner scanner = new Scanner(replace);
 		String result = "";
