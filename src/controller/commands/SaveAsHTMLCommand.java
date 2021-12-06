@@ -32,6 +32,8 @@ public class SaveAsHTMLCommand implements Command {
 	private boolean isLetter = false;
 	private boolean readTable = false;
 	private String letterDestination;
+	private int subsubsectionCount = 1;
+	private boolean tableWithBorder = true;
 	
 	public SaveAsHTMLCommand() {
 		Date date = new Date();
@@ -65,12 +67,15 @@ public class SaveAsHTMLCommand implements Command {
 		LatexHTML.put("\\opening", "<div>");// xwris close
 		LatexHTML.put("\\closing", "</div><p style='float: right'>");
 		LatexHTML.put("\\ps", "");
+		LatexHTML.put("\\caption", "<figcaption>");
+		LatexHTML.put("\\hline", "<hr>");
 		
 		noClosingTags.add("\\maketitle");
 		noClosingTags.add("\\title");
 		noClosingTags.add("\\encl");
 		noClosingTags.add("\\opening");
 		noClosingTags.add("\\ps");
+		noClosingTags.add("\\hline");
 	}
 	
 	public String closingTag(String tag) {
@@ -98,14 +103,18 @@ public class SaveAsHTMLCommand implements Command {
 						ChapterCount++;
 					}else if(FirstPart.equals("\\section")) {
 						extra = sectionCount + " ";
-						subsectionCount = 1;
 						sectionCount++;
+						subsectionCount = 1;
 					}else if(FirstPart.equals("\\closing")) {
 						extra = LatexHTML.get(FirstPart) + SecondPart + "<br>" + letterSignature + "</p>";
 						return extra;
 					}else if(FirstPart.equals("\\subsection")) {
-						extra = sectionCount + "." + subsectionCount + " ";
+						subsubsectionCount = 1;
+						extra = sectionCount-1 + "." + subsectionCount + " ";
 						subsectionCount++;
+					}else if(FirstPart.equals("\\subsubsection")) {
+						extra = sectionCount-1 + "." + (subsectionCount-1) + "." + subsubsectionCount + " ";
+						subsubsectionCount++;
 					}else if(FirstPart.equals("\\begin")) {
 						if(SecondPart.equals("document")) {
 							result = "<body>";
@@ -114,7 +123,12 @@ public class SaveAsHTMLCommand implements Command {
 							result = "<center><h3>Abstract</h3></center>";
 							return result;
 						}else if(SecondPart.equals("tabular")) {
-							result = "<table style='border:1px solid black;'>";
+							if(ThirdPart.contains("|")) {
+								result = "<table style='border:1px solid black;'>";
+								tableWithBorder = true;
+							}else {
+								result = "<table>";
+							}
 							readTable = true;
 							return result;
 						}else if(SecondPart.equals("center")) {
@@ -144,6 +158,7 @@ public class SaveAsHTMLCommand implements Command {
 							return result;
 						}else if(SecondPart.equals("tabular")) {
 							result = "</table>";
+							tableWithBorder = false;
 							readTable = false;
 							return result;
 						}else if(SecondPart.equals("figure")) {
@@ -219,9 +234,17 @@ public class SaveAsHTMLCommand implements Command {
 			}else if(readTable) {
 				line  = line.replace("\\\\", "");
 				String[] parts = line.split("&");
-				result += "<tr style='border:1px solid black;'>";
+				if(tableWithBorder) {
+					result += "<tr style='border:1px solid black;'>";
+				}else {
+					result += "<tr>";
+				}
 				for(int i = 0;i<parts.length;i++) {
-					result += "<td style='border:1px solid black;'>" + parts[i] + "</td>";
+					if(tableWithBorder) {
+						result += "<td style='border:1px solid black;'>" + parts[i] + "</td>";
+					}else {
+						result += "<td>" + parts[i] + "</td>";
+					}
 				}
 				result += "</tr>";
 				return result;
@@ -244,6 +267,8 @@ public class SaveAsHTMLCommand implements Command {
 		letterDestination = "";
 		readTable = false;
 		subsectionCount = 1;
+		subsubsectionCount = 1;
+		tableWithBorder = false;
 		
 		Scanner scanner = new Scanner(replace);
 		String result = "";
