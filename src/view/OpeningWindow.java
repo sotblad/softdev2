@@ -3,6 +3,8 @@ package view;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import controller.LatexEditorController;
 import model.VersionsManager;
@@ -10,6 +12,7 @@ import model.strategies.VersionsStrategy;
 import model.strategies.VolatileVersionsStrategy;
 
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
@@ -71,8 +74,24 @@ public class OpeningWindow {
 		JButton btnOpenExistingDocument = new JButton("Open Existing Document");
 		btnOpenExistingDocument.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser chooser = new JFileChooser();
-				chooser.showOpenDialog(null);
+				JFileChooser filechooser = new JFileChooser();
+				int option = filechooser.showOpenDialog(null);
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("File formats", "tex"); //"html");
+				filechooser.setFileFilter(filter);
+				if(option == JFileChooser.APPROVE_OPTION) {
+					try {
+						String filename = filechooser.getSelectedFile().toString();
+						JEditorPane editorPane = new JEditorPane();
+						latexEditorController.setFilename(filename);
+						
+						latexEditorController.setType("emptyTemplate");
+						latexEditorController.getController().enact("load");
+						MainWindow mainWindow = new MainWindow(latexEditorController, editorPane);
+					frame.dispose();
+					}catch(Exception e1){
+						JOptionPane.showMessageDialog(frame, "Invalid file format entered.");
+					}
+				}
 			}
 		});
 		btnOpenExistingDocument.setBounds(89, 92, 278, 36);
