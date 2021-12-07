@@ -142,6 +142,9 @@ public class SaveAsHTMLCommand implements Command {
 						}else if(SecondPart.equals("enumerate")) {
 							result = "<ol>";
 							return result;
+						}else if(SecondPart.equals("table")) {
+							result = "";
+							return result;
 						}else if(SecondPart.equals("letter")) {
 							letterDestination = ThirdPart.substring(ThirdPart.indexOf("{")+1, ThirdPart.indexOf("}")) + "<p>";
 							result = "<div id='letter'>";
@@ -168,6 +171,9 @@ public class SaveAsHTMLCommand implements Command {
 							return result;
 						}else if(SecondPart.equals("itemize")) {
 							result = "</ul>";
+							return result;
+						}else if(SecondPart.equals("table")) {
+							result = "";
 							return result;
 						}else if(SecondPart.equals("enumerate")) {
 							result = "</ol>";
@@ -203,13 +209,13 @@ public class SaveAsHTMLCommand implements Command {
 				}else if(line.contains("includegraphics")) {
 					String sizes = line.substring(line.indexOf("[")+1, line.indexOf("]"));
 					String[] widthHeight = sizes.split(",");
-					float width = Float.parseFloat(widthHeight[0].substring(widthHeight[0].indexOf("=")+1));
-					float height = Float.parseFloat(widthHeight[1].substring(widthHeight[1].indexOf("=")+1));
+					Integer width = Integer.parseInt(widthHeight[0].substring(widthHeight[0].indexOf("=")+1));
+					Integer height = Integer.parseInt(widthHeight[1].substring(widthHeight[1].indexOf("=")+1));
 					String imageLocation = line.substring(line.indexOf("]")+1);
 					imageLocation = (imageLocation.replace("{", "")).replace("}", "");
 					
 					
-					return "<img src='" + imageLocation + "' width='" + width + "' height='" + height + "'>";
+					return "<img src='" + imageLocation + "' width='" + width + "px' height='" + height + "px'>";
 				}else if(line.contains("\\address{")) {
 					letterSignerAddress = SecondPart + "<br>"; 
 					return "";
