@@ -4,9 +4,9 @@ import java.util.HashMap;
 
 import javax.swing.JEditorPane;
 
+import controller.LatexEditorController;
 import controller.Singleton;
 import model.VersionsManager;
-import view.LatexEditorView;
 
 public class AddLatexCommand implements Command  {
 	private VersionsManager versionsManager = Singleton.versionsManager;
@@ -42,8 +42,8 @@ public class AddLatexCommand implements Command  {
 	}
 	
 	public void editContents(String type) {
-		LatexEditorView latexEditorView = versionsManager.getEditorView();
-		JEditorPane editorPane = latexEditorView.getEditorPane();
+		LatexEditorController latexEditorController = versionsManager.getEditorView();
+		JEditorPane editorPane = latexEditorController.getEditorPane();
 		String contents = editorPane.getText();
 		String before = contents.substring(0, editorPane.getCaretPosition());
 		String after = contents.substring(editorPane.getCaretPosition());
@@ -51,8 +51,8 @@ public class AddLatexCommand implements Command  {
 		if(commandsContentsList.containsKey(type)) {
 			contents = before + commandsContentsList.get(type) +after;
 		}
-		latexEditorView.setText(contents);
-		latexEditorView.getController().enact("addLatex");
+		latexEditorController.setText(contents);
+		latexEditorController.getController().enact("addLatex");
 		editorPane.setText(contents);
 	}
 

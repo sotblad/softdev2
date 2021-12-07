@@ -1,5 +1,6 @@
 package controller.commands;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,10 +9,10 @@ import java.util.Scanner;
 
 import javax.swing.JFileChooser;
 
+import controller.LatexEditorController;
 import controller.Singleton;
 import model.Document;
 import model.VersionsManager;
-import view.LatexEditorView;
 
 public class SaveAsHTMLCommand implements Command {
 	private VersionsManager versionsManager = Singleton.versionsManager;
@@ -36,7 +37,8 @@ public class SaveAsHTMLCommand implements Command {
 	private boolean tableWithBorder = true;
 	
 	public SaveAsHTMLCommand() {
-		Date date = new Date();
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		String date = format.format(new Date());
 		LatexHTML.put("\\chapter", "<h1>");
 		LatexHTML.put("\\section", "<h2>");
 		LatexHTML.put("\\subsection", "<h3>");
@@ -50,8 +52,8 @@ public class SaveAsHTMLCommand implements Command {
 		LatexHTML.put("\\texttt", "<tt>");
 		LatexHTML.put("\\title", "<head><center><h2>");
 		LatexHTML.put("\\and", "&emsp;");
-		LatexHTML.put("\\date", "<p id='date'>");
-		LatexHTML.put("\\today", date.toString());
+		LatexHTML.put("\\date", "<div class='date'>");
+		LatexHTML.put("\\today", date);
 		LatexHTML.put("\\author", "<p>");
 		LatexHTML.put("\\begin", "<>");
 		LatexHTML.put("\\maketitle", "</h2></center></head>");
@@ -92,7 +94,7 @@ public class SaveAsHTMLCommand implements Command {
 					if(FirstPart.contains("\\chapter")) {
 						if(!FirstPart.contains("*")) {
 							if(numberingEnabled) {
-								extra += extra = "Chapter "+ ChapterCount + ": \n<br>\n<br>\n";
+								extra += extra = "Chapter "+ ChapterCount + ": <br><br>\n";
 							}
 							ChapterCount++;
 						}
@@ -114,7 +116,7 @@ public class SaveAsHTMLCommand implements Command {
 						subsubsectionCount++;
 					}else if(FirstPart.equals("\\begin")) {
 						if(SecondPart.equals("document")) {
-							result = "<body>";
+							result = "<div id='document'>";
 							return result;
 						}else if(SecondPart.equals("abstract")) {
 							result = "<div id='abstract'><center><h3>Abstract</h3></center>";
@@ -148,7 +150,7 @@ public class SaveAsHTMLCommand implements Command {
 						}
 					}else if(FirstPart.equals("\\end")) {
 						if(SecondPart.equals("document")) {
-							result = "</body>";
+							result = "</div>";
 							return result;
 						}else if(SecondPart.equals("abstract")) {
 							result = "</div>";
@@ -174,6 +176,9 @@ public class SaveAsHTMLCommand implements Command {
 							result = "</div>";
 							return result;
 						}
+					}else if(FirstPart.equals("\\date")) {
+						result = LatexHTML.get(FirstPart.replace("*", "")) + SecondPart + "</div>" + ThirdPart;
+						return result;
 					}
 					
 					FirstPart = LatexHTML.get(FirstPart.replace("*", ""));
@@ -187,9 +192,9 @@ public class SaveAsHTMLCommand implements Command {
 				if(line.contains("documentclass")) {
 					if(line.contains("[")) {
 						fontSize = line.substring(line.indexOf("[")+1, line.indexOf(","));
-						result = "<font style='font-size:"+fontSize+"'>";
+						result = "\n<font style='font-size:"+fontSize+"'>";
 					}
-					return "";
+					return result;
 				}else if(line.contains("usepackage")) {
 					return "";
 				}else if(line.contains("signature")) {
@@ -251,8 +256,8 @@ public class SaveAsHTMLCommand implements Command {
 	}
 	
 	public void saveAsHTML() {
-		LatexEditorView latexEditorView = versionsManager.getEditorView();
-		String documentContents = latexEditorView.getCurrentDocument().getContents();
+		LatexEditorController latexEditorController = versionsManager.getEditorView();
+		String documentContents = latexEditorController.getCurrentDocument().getContents();
 		
 		numberingEnabled = true;
 		ChapterCount = 1;

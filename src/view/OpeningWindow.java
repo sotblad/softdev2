@@ -18,7 +18,7 @@ import java.awt.event.ActionEvent;
 public class OpeningWindow {
 
 	private JFrame frame;
-	private LatexEditorView latexEditorView;
+	private LatexEditorController latexEditorController;
 	/**
 	 * Launch the application.
 	 */
@@ -40,11 +40,11 @@ public class OpeningWindow {
 	 */
 	public OpeningWindow() {
 		VersionsStrategy versionsStrategy = new VolatileVersionsStrategy();
-		latexEditorView = new LatexEditorView();
-		VersionsManager versionsManager = new VersionsManager(versionsStrategy, latexEditorView);
+		latexEditorController = new LatexEditorController();
+		VersionsManager versionsManager = new VersionsManager(versionsStrategy, latexEditorController);
 		LatexEditorController controller = new LatexEditorController(versionsManager);
-		latexEditorView.setController(controller);
-		latexEditorView.setVersionsManager(versionsManager);
+		latexEditorController.setController(controller);
+		latexEditorController.setVersionsManager(versionsManager);
 		initialize();
 		frame.setVisible(true);
 	}
@@ -55,13 +55,13 @@ public class OpeningWindow {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
-		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
 		JButton btnCreateNewDocument = new JButton("Create New Document");
 		btnCreateNewDocument.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ChooseTemplate chooseTemplate = new ChooseTemplate(latexEditorView, "opening");
+				ChooseTemplate chooseTemplate = new ChooseTemplate(latexEditorController, "opening");
 				frame.dispose();
 			}
 		});
