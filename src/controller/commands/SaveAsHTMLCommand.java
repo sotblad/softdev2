@@ -88,20 +88,20 @@ public class SaveAsHTMLCommand implements Command {
 			if(LatexHTML.containsKey(FirstPart.replace("*", ""))) {
 				if(!noClosingTags.contains(FirstPart)) {
 					String extra = "";
-					
-					if(FirstPart.contains("*")) {
-						FirstPart = FirstPart.replace("*", "");
-					}
 
-					if(FirstPart.equals("\\chapter")) {
-						if(numberingEnabled) {
-							extra += extra = "Chapter "+ ChapterCount + ": \n<br>\n<br>\n";
+					if(FirstPart.contains("\\chapter")) {
+						if(!FirstPart.contains("*")) {
+							if(numberingEnabled) {
+								extra += extra = "Chapter "+ ChapterCount + ": \n<br>\n<br>\n";
+							}
+							ChapterCount++;
 						}
-						ChapterCount++;
-					}else if(FirstPart.equals("\\section")) {
-						extra = sectionCount + " ";
-						sectionCount++;
-						subsectionCount = 1;
+					}else if(FirstPart.contains("\\section")) {
+						if(!FirstPart.contains("*")) {
+							extra = sectionCount + " ";
+							sectionCount++;
+							subsectionCount = 1;
+						}
 					}else if(FirstPart.equals("\\closing")) {
 						extra = LatexHTML.get(FirstPart) + SecondPart + "<br>" + letterSignature + "</p>";
 						return extra;
@@ -176,7 +176,7 @@ public class SaveAsHTMLCommand implements Command {
 						}
 					}
 					
-					FirstPart = LatexHTML.get(FirstPart);
+					FirstPart = LatexHTML.get(FirstPart.replace("*", ""));
 					result = FirstPart + extra + SecondPart + closingTag(FirstPart) + ThirdPart;
 				}else {
 					FirstPart = LatexHTML.get(FirstPart);
@@ -202,7 +202,6 @@ public class SaveAsHTMLCommand implements Command {
 					float height = Float.parseFloat(widthHeight[1].substring(widthHeight[1].indexOf("=")+1));
 					String imageLocation = line.substring(line.indexOf("]")+1);
 					imageLocation = (imageLocation.replace("{", "")).replace("}", "");
-					System.out.println(imageLocation);
 					
 					
 					return "<img src='" + imageLocation + "' width='" + width + "' height='" + height + "'>";
@@ -254,7 +253,7 @@ public class SaveAsHTMLCommand implements Command {
 	public void saveAsHTML() {
 		LatexEditorView latexEditorView = versionsManager.getEditorView();
 		String documentContents = latexEditorView.getCurrentDocument().getContents();
-		String replace = documentContents.replace("\\n", "\n<br>");
+		
 		numberingEnabled = true;
 		ChapterCount = 1;
 		sectionCount = 1;
@@ -267,7 +266,7 @@ public class SaveAsHTMLCommand implements Command {
 		subsubsectionCount = 1;
 		tableWithBorder = false;
 		
-		Scanner scanner = new Scanner(replace);
+		Scanner scanner = new Scanner(documentContents);
 		String result = "";
 		while (scanner.hasNextLine()) {
 		  String line = scanner.nextLine();
@@ -278,12 +277,13 @@ public class SaveAsHTMLCommand implements Command {
 		}
 		if(isLetter) {
 			Date date = new Date();
-			result = "<html><p style='float: right'>"+letterSignerAddress+"<br>" + date.toString() + "</p><br><br>" + letterDestination + result;
+			result = "<html>\n<p style='float: right'>"+letterSignerAddress+"\n<br>" + date.toString() + "</p>\n<br>\n<br>" + letterDestination + result;
 		  }else {
 			  result = "<html>" + result;
 		  }
 		result += "</html>";
-		System.out.println(result);
+		String replace = result.replace("\\n", "\n<br>");
+		System.out.println(replace);
 		scanner.close();
 	}
 
