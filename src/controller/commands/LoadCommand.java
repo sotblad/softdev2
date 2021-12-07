@@ -39,6 +39,7 @@ public class LoadCommand implements Command {
 		currentDocument = new Document();
 		currentDocument.setContents(fileContents);
 		
+		versionsManager.getEditorView().setCurrentDocument(currentDocument);
 		type = "emptyTemplate";
 		
 		fileContents = fileContents.trim();

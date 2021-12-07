@@ -29,7 +29,8 @@ public class LatexEditorController{
 						"load",
 						"rollbackToPreviousVersion",
 						"save",
-						"saveAsHTML"
+						"saveAsHTML",
+						"loadAsLatex"
 				}
 		);
 

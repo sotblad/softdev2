@@ -39,32 +39,25 @@ public class SaveAsHTMLCommand implements Command {
 		Date date = new Date();
 		LatexHTML.put("\\chapter", "<h1>");
 		LatexHTML.put("\\section", "<h2>");
-		LatexHTML.put("\\section*", "<h2>");
 		LatexHTML.put("\\subsection", "<h3>");
 		LatexHTML.put("\\subsubsection", "<h4>");
 		LatexHTML.put("\\paragraph", "<h5>");
-		LatexHTML.put("\\subparagraph", "<h5>");
-		LatexHTML.put("\\begin{itemize}", "<ul>");
-		LatexHTML.put("\\begin{document}", "<ul>");
+		LatexHTML.put("\\subparagraph", "<h6>");
 		LatexHTML.put("\\item", "<li>");
-		LatexHTML.put("\\begin{description}", "<dl>");
-		LatexHTML.put("\\emph{text}", "<em>");
-		LatexHTML.put("\\textit{text}", "<i>");
-		LatexHTML.put("\\textbf{text}", "<b>");
-		LatexHTML.put("\\texttt{text}", "<tt>");
-		LatexHTML.put("\\n", "<br>");
-		LatexHTML.put("\\title", "<center><h2>");
+		LatexHTML.put("\\emph", "<em>");
+		LatexHTML.put("\\textit", "<i>");
+		LatexHTML.put("\\textbf", "<b>");
+		LatexHTML.put("\\texttt", "<tt>");
+		LatexHTML.put("\\title", "<head><center><h2>");
 		LatexHTML.put("\\and", "&emsp;");
-		LatexHTML.put("\\date", "<p>");
+		LatexHTML.put("\\date", "<p id='date'>");
 		LatexHTML.put("\\today", date.toString());
 		LatexHTML.put("\\author", "<p>");
-		LatexHTML.put("\\chapter", "<h1>");
-		LatexHTML.put("\\chapter*", "<h1>");
 		LatexHTML.put("\\begin", "<>");
-		LatexHTML.put("\\maketitle", "</h2></center>");
+		LatexHTML.put("\\maketitle", "</h2></center></head>");
 		LatexHTML.put("\\end", "<>");// xwris close
 		LatexHTML.put("\\encl", "encl: ");// xwris close
-		LatexHTML.put("\\opening", "<div>");// xwris close
+		LatexHTML.put("\\opening", "<div id='opening'>");// xwris close
 		LatexHTML.put("\\closing", "</div><p style='float: right'>");
 		LatexHTML.put("\\ps", "");
 		LatexHTML.put("\\caption", "<figcaption>");
@@ -92,13 +85,17 @@ public class SaveAsHTMLCommand implements Command {
 			SecondPart = line.substring(line.indexOf("{")+1, line.indexOf("}"));
 			ThirdPart = line.substring(line.indexOf("}")+1);
 			
-			if(LatexHTML.containsKey(FirstPart)) {
+			if(LatexHTML.containsKey(FirstPart.replace("*", ""))) {
 				if(!noClosingTags.contains(FirstPart)) {
 					String extra = "";
+					
+					if(FirstPart.contains("*")) {
+						FirstPart = FirstPart.replace("*", "");
+					}
 
 					if(FirstPart.equals("\\chapter")) {
 						if(numberingEnabled) {
-							extra += extra = "Chapter "+ ChapterCount + ": <br><br>";
+							extra += extra = "Chapter "+ ChapterCount + ": \n<br>\n<br>\n";
 						}
 						ChapterCount++;
 					}else if(FirstPart.equals("\\section")) {
@@ -120,7 +117,7 @@ public class SaveAsHTMLCommand implements Command {
 							result = "<body>";
 							return result;
 						}else if(SecondPart.equals("abstract")) {
-							result = "<center><h3>Abstract</h3></center>";
+							result = "<div id='abstract'><center><h3>Abstract</h3></center>";
 							return result;
 						}else if(SecondPart.equals("tabular")) {
 							if(ThirdPart.contains("|")) {
@@ -154,7 +151,7 @@ public class SaveAsHTMLCommand implements Command {
 							result = "</body>";
 							return result;
 						}else if(SecondPart.equals("abstract")) {
-							result = "";
+							result = "</div>";
 							return result;
 						}else if(SecondPart.equals("tabular")) {
 							result = "</table>";
@@ -257,7 +254,7 @@ public class SaveAsHTMLCommand implements Command {
 	public void saveAsHTML() {
 		LatexEditorView latexEditorView = versionsManager.getEditorView();
 		String documentContents = latexEditorView.getCurrentDocument().getContents();
-		String replace = documentContents.replace("\\n", "<br>");
+		String replace = documentContents.replace("\\n", "\n<br>");
 		numberingEnabled = true;
 		ChapterCount = 1;
 		sectionCount = 1;

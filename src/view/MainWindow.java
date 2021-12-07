@@ -125,6 +125,15 @@ public class MainWindow {
 		});
 		mnFile.add(mntmSaveAsHTML);
 		
+		JMenuItem mntmloadAsLatex = new JMenuItem("Load HTML as Latex");
+		mntmloadAsLatex.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				latexEditorView.getController().enact("loadAsLatex");
+				
+			}
+		});
+		mnFile.add(mntmloadAsLatex);
+		
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mnFile.add(mntmExit);
 		

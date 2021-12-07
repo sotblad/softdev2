@@ -34,6 +34,9 @@ public class CommandFactory {
 		if(type.equals("saveAsHTML")) {
 			return new SaveAsHTMLCommand();
 		}
+		if(type.equals("loadAsLatex")) {
+			return new LoadHTMLAsLatex();
+		}
 		return null;
 	}
 }
