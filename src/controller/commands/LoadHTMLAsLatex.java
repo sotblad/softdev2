@@ -23,11 +23,15 @@ import model.VersionsManager;
 public class LoadHTMLAsLatex implements Command {
 	private VersionsManager versionsManager = Singleton.versionsManager;
 	private HashMap<String, String> HTMLLatex = new HashMap<String, String>();
+	private HashMap<String, String> basic = new HashMap<String, String>();
+	private ArrayList<String> begins = new ArrayList<String>();
 	
 	
 	public LoadHTMLAsLatex() {
-		HTMLLatex.put("<head><center><h2>", "\\title{");
-		HTMLLatex.put("</h2></center></head>", "\\maketitle");
+		basic.put("<head><center><h2>", "\\title{");
+		basic.put("</h2></center></head>", "\\maketitle");
+		basic.put("<div id='abstract'><center><h3>Abstract</h3></center>", "\\begin{abstract}");
+		basic.put("<div id='document'>", "\\begin{document}");
 		HTMLLatex.put("<html>", "");
 		HTMLLatex.put("</html>", "");
 		HTMLLatex.put("<h1>", "\\chapter{");
@@ -44,16 +48,16 @@ public class LoadHTMLAsLatex implements Command {
 		HTMLLatex.put("<br>", "\\n");
 		HTMLLatex.put("</div>", "\\end{");
 		HTMLLatex.put("&emsp;", "\\and");
-		HTMLLatex.put("<p class='date'>", "\\date{");
+		basic.put("<p class='date'>", "\\date{");
+		HTMLLatex.put("</p>", "");
 		HTMLLatex.put("CHECKIFDATE", "\\today");
 		HTMLLatex.put("<p>", "\\author{");
-		HTMLLatex.put("</h2></center></head>", "");
 		HTMLLatex.put("encl: ", "\\encl");// xwris close
-		HTMLLatex.put("<div id='opening'>", "\\opening");// xwris close
-		HTMLLatex.put("</div><p style='float: right'>", "\\closing");
+		basic.put("<div id='opening'>", "\\opening");// xwris close
+		basic.put("</div><p style='float: right'>", "\\closing");
 		HTMLLatex.put("<figcaption>", "\\caption{");
 		HTMLLatex.put("<hr>", "\\hline");
-		HTMLLatex.put("<div id='", "\\begin{");
+		basic.put("<p class='date'>", "\\date{");
 	}
 	
 	public String parser(String line) {
@@ -72,6 +76,14 @@ public class LoadHTMLAsLatex implements Command {
 		
 		if(hasTag) {
 			tag = line.substring(line.indexOf("<")+1, line.indexOf(">")+1);
+			if(tag.contains("font")) {
+				String fontSize = "14";
+				String docType = line.substring(line.indexOf("class='")+7,line.indexOf("' style"));
+				if(docType != "letter") {
+					fontSize = line.substring(line.indexOf(":")+1,line.indexOf("pt"));
+				}
+				return "\\documentclass[" + fontSize + "pt,twocolumn,a4paper]{" + docType + "}\\n\\n";
+			}
 			if(!hasClosingTag) {
 				if(tag.contains(" ")) {
 					tag = tag.substring(0, line.indexOf(" "));
@@ -101,11 +113,11 @@ public class LoadHTMLAsLatex implements Command {
 					if(line.equals("}")) {
 						return "";
 					}
+				}else if(!line.contains("</div>") && !hasTag) {
+					return "";
 				}
 			}
 		}
-	//	System.out.println("TAG: " + tag);
-	//	System.out.println(result);
 		return line;
 	}
 	
@@ -121,15 +133,35 @@ public class LoadHTMLAsLatex implements Command {
 				scanner = new Scanner(new FileInputStream(filename));
 				while (scanner.hasNextLine()) {
 					  String line = scanner.nextLine();
-					  result += parser(line) + "\n";
-					  
-					  for (Map.Entry me : HTMLLatex.entrySet()) {
+					  for (Map.Entry me : basic.entrySet()) {
 							if(line.contains(me.getKey().toString())) {
+								if(me.getValue().toString().contains("begin")) {
+									String value = me.getValue().toString();
+									begins.add(value.substring(value.indexOf("{")+1, value.indexOf("}")));
+								}
 								
-							  result = result.replace(me.getKey().toString(), me.getValue().toString());
-						//	  System.out.println("AAAAAAAAAAAAAAAAAAA" + line + " " + result +" FAK " + me.getValue().toString());
+								line = line.replace(me.getKey().toString(), me.getValue().toString());
 							}
 						  }
+					  String parsedLine = parser(line);
+					  
+					  for (Map.Entry me : HTMLLatex.entrySet()) {
+							if(parsedLine.contains(me.getKey().toString())) {
+								
+								parsedLine = parsedLine.replace(me.getKey().toString(), me.getValue().toString());
+								if(parsedLine.contains("end{")) {
+									parsedLine += begins.get(begins.size()-1);
+									begins.remove(begins.size()-1);
+								}
+							}
+						  }
+					  
+					  if(parsedLine.contains("{") && !parsedLine.contains("}")) {
+						  parsedLine += "}";
+					  }
+					  
+					  result += parsedLine + "\n";
+					  
 					 
 					}
 				System.out.println(result);

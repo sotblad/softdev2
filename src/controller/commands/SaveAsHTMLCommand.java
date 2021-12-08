@@ -52,7 +52,7 @@ public class SaveAsHTMLCommand implements Command {
 		LatexHTML.put("\\texttt", "<tt>");
 		LatexHTML.put("\\title", "<head><center><h2>");
 		LatexHTML.put("\\and", "&emsp;");
-		LatexHTML.put("\\date", "<div class='date'>");
+		LatexHTML.put("\\date", "<p class='date'>");
 		LatexHTML.put("\\today", date);
 		LatexHTML.put("\\author", "<p>");
 		LatexHTML.put("\\begin", "<>");
@@ -183,7 +183,7 @@ public class SaveAsHTMLCommand implements Command {
 							return result;
 						}
 					}else if(FirstPart.equals("\\date")) {
-						result = LatexHTML.get(FirstPart.replace("*", "")) + SecondPart + "</div>" + ThirdPart;
+						result = LatexHTML.get(FirstPart.replace("*", "")) + SecondPart + "</p>" + ThirdPart;
 						return result;
 					}
 					
@@ -198,10 +198,13 @@ public class SaveAsHTMLCommand implements Command {
 				if(line.contains("documentclass")) {
 					if(line.contains("[")) {
 						fontSize = line.substring(line.indexOf("[")+1, line.indexOf(","));
-						result = "\n<font style='font-size:"+fontSize+"'>";
+						String docType = line.substring(line.indexOf("{")+1, line.indexOf("}"));
+						result = "\n<font class='" + docType + "' style='font-size:"+fontSize+"'>";
 					}
 					return result;
 				}else if(line.contains("usepackage")) {
+					return "";
+				}else if(line.contains("label")) {
 					return "";
 				}else if(line.contains("signature")) {
 					letterSignature = SecondPart; 
@@ -288,7 +291,7 @@ public class SaveAsHTMLCommand implements Command {
 		}
 		if(isLetter) {
 			Date date = new Date();
-			result = "<html>\n<p style='float: right'>"+letterSignerAddress+"\n<br>" + date.toString() + "</p>\n<br>\n<br>" + letterDestination + result;
+			result = "<html>\n<p class='letter' style='float: right'>"+letterSignerAddress+"\n<br>" + date.toString() + "</p>\n<br>\n<br>" + letterDestination + result;
 		  }else {
 			  result = "<html>" + result;
 		  }
