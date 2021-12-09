@@ -64,7 +64,7 @@ public class LatexToHTMLParser {
 		return result;
 	}
 	
-	public String cmd(String line) {
+	public String parser(String line) {
 		String result = "";
 		String FirstPart, SecondPart, ThirdPart;
 
@@ -274,7 +274,7 @@ public class LatexToHTMLParser {
 		while (scanner.hasNextLine()) {
 		  String line = scanner.nextLine();
 		  
-		  result += cmd(line) + "\n";
+		  result += parser(line) + "\n";
 			for (Map.Entry me : LatexHTML.entrySet()) {
 				  result = result.replace(me.getKey().toString(), me.getValue().toString());
 			  }
