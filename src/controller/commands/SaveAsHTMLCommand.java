@@ -250,10 +250,14 @@ public class SaveAsHTMLCommand implements Command {
 					result += "<tr>";
 				}
 				for(int i = 0;i<parts.length;i++) {
-					if(tableWithBorder) {
-						result += "<td style='border:1px solid black;'>" + parts[i] + "</td>";
+					if(!parts[i].contains("hline") && !parts[i].equals("")) {
+						if(tableWithBorder) {
+							result += "<td style='border:1px solid black;'>" + parts[i] + "</td>\n";
+						}else {
+							result += "<td>" + parts[i] + "</td>\n";
+						}
 					}else {
-						result += "<td>" + parts[i] + "</td>";
+						return "";
 					}
 				}
 				result += "</tr>";

@@ -30,18 +30,35 @@ public class LoadHTMLAsLatex implements Command {
 	private String senderName = "";
 	private boolean senderNameNext = false;
 	
-	
 	public LoadHTMLAsLatex() {
 		basic.put("<head><center><h2>", "\\title{");
 		basic.put("</h2></center></head>", "\\maketitle");
 		basic.put("<div id='abstract'><center><h3>Abstract</h3></center>", "\\begin{abstract}\n");
 		basic.put("<div id='document'>", "\\begin{document}\\n");
+		basic.put("<table style='border:1px solid black;'>", "\\begin{table}\n\\begin{tabular}{|c|c|c|}");
+		basic.put("<table>", "\\begin{table}\n\\begin{tabular}{ccc}");
+		
+		basic.put("</table>", "\\end{tabular}\n\\end{table}");
+		basic.put("<ul>", "\\begin{itemize}");
+		basic.put("<ol>", "\\begin{enumerate}");
+		basic.put("<li>", "\\item");
+		basic.put("</ul>", "\\end{itemize}");
+		basic.put("</ol>", "\\end{enumerate}");
 		basic.put("<p id='address'>", "");
 		basic.put("<p class='letter' style='float: right'>", "\\documentclass{letter}\\n\nPLACEHOLDERSIGNATURE_1\n\\address{");
+		basic.put("<tr style='border:1px solid black;'><td style='border:1px solid black;'>", "");
+		basic.put("<tr><td>", "");
+		
 		HTMLLatex.put("<html>", "");
 		HTMLLatex.put("</html>", "");
+		basic.put("</tr>", "\\\\");
 		HTMLLatex.put("<h1>", "\\chapter{");
 		HTMLLatex.put("<h2>", "\\section{");
+
+		HTMLLatex.put("<td style='border:1px solid black;'>", " & ");
+		HTMLLatex.put("<td>", " & ");
+		
+		
 		HTMLLatex.put("<h3>", "\\subsection{");
 		HTMLLatex.put("<h4>", "\\subsubsection{");
 		HTMLLatex.put("<h5>", "\\paragraph{");
@@ -146,14 +163,19 @@ public class LoadHTMLAsLatex implements Command {
 				while (scanner.hasNextLine()) {
 					  String line = scanner.nextLine();
 					  boolean isAddress = false;
+					  boolean isTableContent = false;
 					  for (Map.Entry me : basic.entrySet()) {
 							if(line.contains(me.getKey().toString())) {
 								String value = me.getValue().toString();
 								String key = me.getKey().toString();
 								if(value.contains("begin")) {
+									if(!value.contains("tabular") &&  !value.contains("itemize") && !value.contains("enumerate")){
 									begins.add(value.substring(value.indexOf("{")+1, value.indexOf("}")));
+									}
 								}else if(key.equals("<p id='address'>")) {
 									isAddress = true;
+								}else if(key.contains("<td style='border:1px solid black;'>") || key.contains("<td>")) {
+									isTableContent = true;
 								}
 								
 								line = line.replace(me.getKey().toString(), me.getValue().toString());
@@ -174,6 +196,8 @@ public class LoadHTMLAsLatex implements Command {
 								if(parsedLine.contains("end{")) {
 									parsedLine += begins.get(begins.size()-1);
 									begins.remove(begins.size()-1);
+								}else if(me.getKey().toString().equals("<td style='border:1px solid black;'>") || me.getKey().toString().contains("<td>")) {
+									isTableContent = true;
 								}
 							}
 						  }
@@ -209,7 +233,10 @@ public class LoadHTMLAsLatex implements Command {
 							continue;
 						}
 
-					  result += parsedLine + "\n";
+					  result += parsedLine;
+					  if(!isTableContent) {
+						  result += "\n";
+					  }
 					  
 					 
 					}
