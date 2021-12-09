@@ -94,7 +94,7 @@ public class SaveAsHTMLCommand implements Command {
 					if(FirstPart.contains("\\chapter")) {
 						if(!FirstPart.contains("*")) {
 							if(numberingEnabled) {
-								extra += extra = "Chapter "+ ChapterCount + ": <br><br>\n";
+								extra += extra = "Chapter "+ ChapterCount + ": <br><br> ";
 							}
 							ChapterCount++;
 						}
@@ -240,7 +240,7 @@ public class SaveAsHTMLCommand implements Command {
 				numberingEnabled = false;
 				return "";
 			}else if(line.contains("%") && line.substring(0, 1).equals("%")) {
-				return "<!-- " + line.substring(1) + " -->";
+				return "<!-- " + line.substring(1).replace("\\n", "") + " -->";
 			}else if(readTable) {
 				line  = line.replace("\\\\", "");
 				String[] parts = line.split("&");

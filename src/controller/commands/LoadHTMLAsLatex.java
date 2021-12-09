@@ -31,7 +31,7 @@ public class LoadHTMLAsLatex implements Command {
 		basic.put("<head><center><h2>", "\\title{");
 		basic.put("</h2></center></head>", "\\maketitle");
 		basic.put("<div id='abstract'><center><h3>Abstract</h3></center>", "\\begin{abstract}");
-		basic.put("<div id='document'>", "\\begin{document}");
+		basic.put("<div id='document'>", "\\begin{document}\\n");
 		HTMLLatex.put("<html>", "");
 		HTMLLatex.put("</html>", "");
 		HTMLLatex.put("<h1>", "\\chapter{");
@@ -46,6 +46,8 @@ public class LoadHTMLAsLatex implements Command {
 		HTMLLatex.put("<b>", "\\textbf{");
 		HTMLLatex.put("<tt>", "\\texttt{");
 		HTMLLatex.put("<br>", "\\n");
+		HTMLLatex.put("<!--", "%");
+		HTMLLatex.put("-->", "");
 		HTMLLatex.put("</div>", "\\end{");
 		HTMLLatex.put("&emsp;", "\\and");
 		basic.put("<p class='date'>", "\\date{");
@@ -104,12 +106,13 @@ public class LoadHTMLAsLatex implements Command {
 				line = line.replace(id, id.substring(0,id.length()-2)) + "}";
 			}
 		}
+		
 		if(hasClosingTag) {
 			if(line.equals("</h2></center></head>")){
 				return "\\maketitle";
 			}else {
 				if(!line.contains("</div>")) {
-					line = line.replaceAll("</.*>", "}");
+					line = line.replaceAll("</.*>", "");
 					if(line.equals("}")) {
 						return "";
 					}
@@ -135,8 +138,8 @@ public class LoadHTMLAsLatex implements Command {
 					  String line = scanner.nextLine();
 					  for (Map.Entry me : basic.entrySet()) {
 							if(line.contains(me.getKey().toString())) {
-								if(me.getValue().toString().contains("begin")) {
-									String value = me.getValue().toString();
+								String value = me.getValue().toString();
+								if(value.contains("begin")) {
 									begins.add(value.substring(value.indexOf("{")+1, value.indexOf("}")));
 								}
 								
@@ -158,7 +161,14 @@ public class LoadHTMLAsLatex implements Command {
 					  
 					  if(parsedLine.contains("{") && !parsedLine.contains("}")) {
 						  parsedLine += "}";
+						  
+						  if(parsedLine.contains("date{")) {
+								String date = parsedLine.substring(parsedLine.indexOf("{")+1, parsedLine.indexOf("}"));
+								parsedLine = parsedLine.replace(date, "\\today");
+							}
 					  }
+					  parsedLine = parsedLine.replaceAll("Chapter \\d+: \\\\n\\\\n ", "");
+					  parsedLine = parsedLine.replaceAll("\\\\section\\{\\d+ ", "\\\\section{");
 					  
 					  result += parsedLine + "\n";
 					  
