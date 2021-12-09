@@ -199,6 +199,8 @@ public class LoadHTMLAsLatex implements Command {
 					  }
 					  parsedLine = parsedLine.replaceAll("Chapter \\d+: \\\\n\\\\n ", "");
 					  parsedLine = parsedLine.replaceAll("\\\\section\\{\\d+ ", "\\\\section{");
+					  parsedLine = parsedLine.replaceAll("\\\\subsection\\{[+-]?([0-9]*[.])?[0-9]+ ", "\\\\subsection{");
+					  parsedLine = parsedLine.replaceAll("\\\\subsubsection\\{[+-]?([0-9]*[.])([0-9]*[.])?[0-9]+ ", "\\\\subsubsection{");
 					  
 					  Pattern regex = Pattern.compile("\\d+:\\d+:\\d+");
 						Matcher regexMatcher = regex.matcher(line);
