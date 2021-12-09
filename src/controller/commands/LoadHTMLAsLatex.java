@@ -35,6 +35,7 @@ public class LoadHTMLAsLatex implements Command {
 		basic.put("</h2></center></head>", "\\maketitle");
 		basic.put("<div id='abstract'><center><h3>Abstract</h3></center>", "\\begin{abstract}\n");
 		basic.put("<div id='document'>", "\\begin{document}\\n");
+		basic.put("<div id='figure'>", "\\begin{figure}");
 		basic.put("<table style='border:1px solid black;'>", "\\begin{table}\n\\begin{tabular}{|c|c|c|}");
 		basic.put("<table>", "\\begin{table}\n\\begin{tabular}{ccc}");
 		
@@ -220,6 +221,12 @@ public class LoadHTMLAsLatex implements Command {
 						  parsedLine += "}";
 					  }else if(parsedLine.contains("\\closing")) {
 						  senderNameNext = true;
+					  }else if(parsedLine.contains("<img src=")) {
+						  String image = parsedLine.substring(parsedLine.indexOf("'")+1,parsedLine.indexOf("jpg")+3);
+						  String width = parsedLine.substring(parsedLine.indexOf("width")+7,parsedLine.indexOf("px"));
+						  String height = parsedLine.substring(parsedLine.indexOf("height")+8);
+						  height = height.substring(0,height.indexOf("px"));
+						  parsedLine = "\\includegraphics[width=" + width +",height=" + height +"]{" + image + "}";
 					  }
 					  parsedLine = parsedLine.replaceAll("Chapter \\d+: \\\\n\\\\n ", "");
 					  parsedLine = parsedLine.replaceAll("\\\\section\\{\\d+ ", "\\\\section{");

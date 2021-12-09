@@ -98,6 +98,8 @@ public class SaveAsHTMLCommand implements Command {
 							}
 							ChapterCount++;
 						}
+					}else if(line.contains("\\label")) {
+						ThirdPart = ThirdPart.substring(0,ThirdPart.indexOf("\\label{"));
 					}else if(FirstPart.contains("\\section")) {
 						if(!FirstPart.contains("*")) {
 							extra = sectionCount + " ";
