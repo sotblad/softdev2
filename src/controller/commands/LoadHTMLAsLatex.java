@@ -25,13 +25,19 @@ public class LoadHTMLAsLatex implements Command {
 	private HashMap<String, String> HTMLLatex = new HashMap<String, String>();
 	private HashMap<String, String> basic = new HashMap<String, String>();
 	private ArrayList<String> begins = new ArrayList<String>();
+	private String docType = "";
+	private String destAddress = "";
+	private String senderName = "";
+	private boolean senderNameNext = false;
 	
 	
 	public LoadHTMLAsLatex() {
 		basic.put("<head><center><h2>", "\\title{");
 		basic.put("</h2></center></head>", "\\maketitle");
-		basic.put("<div id='abstract'><center><h3>Abstract</h3></center>", "\\begin{abstract}");
+		basic.put("<div id='abstract'><center><h3>Abstract</h3></center>", "\\begin{abstract}\n");
 		basic.put("<div id='document'>", "\\begin{document}\\n");
+		basic.put("<p id='address'>", "");
+		basic.put("<p class='letter' style='float: right'>", "\\documentclass{letter}\\n\nPLACEHOLDERSIGNATURE_1\n\\address{");
 		HTMLLatex.put("<html>", "");
 		HTMLLatex.put("</html>", "");
 		HTMLLatex.put("<h1>", "\\chapter{");
@@ -47,16 +53,16 @@ public class LoadHTMLAsLatex implements Command {
 		HTMLLatex.put("<tt>", "\\texttt{");
 		HTMLLatex.put("<br>", "\\n");
 		HTMLLatex.put("<!--", "%");
-		HTMLLatex.put("-->", "");
+		HTMLLatex.put(" -->", "\\n\\n");
 		HTMLLatex.put("</div>", "\\end{");
 		HTMLLatex.put("&emsp;", "\\and");
 		basic.put("<p class='date'>", "\\date{");
 		HTMLLatex.put("</p>", "");
 		HTMLLatex.put("CHECKIFDATE", "\\today");
 		HTMLLatex.put("<p>", "\\author{");
-		HTMLLatex.put("encl: ", "\\encl");// xwris close
-		basic.put("<div id='opening'>", "\\opening");// xwris close
-		basic.put("</div><p style='float: right'>", "\\closing");
+		HTMLLatex.put("encl: ", "\\encl{");// xwris close
+		basic.put("<div id='opening'>", "\\opening{");// xwris close
+		basic.put("</div><p style='float: right'>", "\\closing{");
 		HTMLLatex.put("<figcaption>", "\\caption{");
 		HTMLLatex.put("<hr>", "\\hline");
 		basic.put("<p class='date'>", "\\date{");
@@ -80,9 +86,12 @@ public class LoadHTMLAsLatex implements Command {
 			tag = line.substring(line.indexOf("<")+1, line.indexOf(">")+1);
 			if(tag.contains("font")) {
 				String fontSize = "14";
-				String docType = line.substring(line.indexOf("class='")+7,line.indexOf("' style"));
-				if(docType != "letter") {
+				docType = line.substring(line.indexOf("class='")+7,line.indexOf("' style"));
+
+				if(!docType.equals("letter")) {
 					fontSize = line.substring(line.indexOf(":")+1,line.indexOf("pt"));
+				}else {
+					return "\\documentclass{" + docType + "}\\n";
 				}
 				return "\\documentclass[" + fontSize + "pt,twocolumn,a4paper]{" + docType + "}\\n\\n";
 			}
@@ -136,17 +145,27 @@ public class LoadHTMLAsLatex implements Command {
 				scanner = new Scanner(new FileInputStream(filename));
 				while (scanner.hasNextLine()) {
 					  String line = scanner.nextLine();
+					  boolean isAddress = false;
 					  for (Map.Entry me : basic.entrySet()) {
 							if(line.contains(me.getKey().toString())) {
 								String value = me.getValue().toString();
+								String key = me.getKey().toString();
 								if(value.contains("begin")) {
 									begins.add(value.substring(value.indexOf("{")+1, value.indexOf("}")));
+								}else if(key.equals("<p id='address'>")) {
+									isAddress = true;
 								}
 								
 								line = line.replace(me.getKey().toString(), me.getValue().toString());
 							}
 						  }
 					  String parsedLine = parser(line);
+					  if(isAddress) {
+						  destAddress = parsedLine.substring(0,parsedLine.indexOf("<"));
+						  basic.put("<div id='letter'>", "\\begin{letter}{"+destAddress+"}\\n");
+						  isAddress = false;
+						  continue;
+					  }
 					  
 					  for (Map.Entry me : HTMLLatex.entrySet()) {
 							if(parsedLine.contains(me.getKey().toString())) {
@@ -167,16 +186,33 @@ public class LoadHTMLAsLatex implements Command {
 								parsedLine = parsedLine.replace(date, "\\today");
 							}
 					  }
+					  if(senderNameNext) {
+						  senderName = parsedLine;
+						  result = result.replaceAll("PLACEHOLDERSIGNATURE_1", "\\\\signature{" + senderName.toString() + "}\\\\n");
+						  senderNameNext = false;
+						  continue;
+					  }
+					  if(parsedLine.contains("\\address{")) {
+						  parsedLine += "}";
+					  }else if(parsedLine.contains("\\closing")) {
+						  senderNameNext = true;
+					  }
 					  parsedLine = parsedLine.replaceAll("Chapter \\d+: \\\\n\\\\n ", "");
 					  parsedLine = parsedLine.replaceAll("\\\\section\\{\\d+ ", "\\\\section{");
 					  
+					  Pattern regex = Pattern.compile("\\d+:\\d+:\\d+");
+						Matcher regexMatcher = regex.matcher(line);
+						boolean hasDate = regexMatcher.find();
+						if(hasDate) {
+							continue;
+						}
+
 					  result += parsedLine + "\n";
 					  
 					 
 					}
 				System.out.println(result);
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			

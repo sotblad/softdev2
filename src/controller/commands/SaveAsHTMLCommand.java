@@ -105,7 +105,7 @@ public class SaveAsHTMLCommand implements Command {
 							subsectionCount = 1;
 						}
 					}else if(FirstPart.equals("\\closing")) {
-						extra = LatexHTML.get(FirstPart) + SecondPart + "<br>" + letterSignature + "</p>";
+						extra = LatexHTML.get(FirstPart) + SecondPart + "<br>\n" + letterSignature + "</p>";
 						return extra;
 					}else if(FirstPart.equals("\\subsection")) {
 						subsubsectionCount = 1;
@@ -240,7 +240,7 @@ public class SaveAsHTMLCommand implements Command {
 				numberingEnabled = false;
 				return "";
 			}else if(line.contains("%") && line.substring(0, 1).equals("%")) {
-				return "<!-- " + line.substring(1).replace("\\n", "") + " -->";
+				return "<!--" + line.substring(1).replace("\\n", "") + " -->";
 			}else if(readTable) {
 				line  = line.replace("\\\\", "");
 				String[] parts = line.split("&");
@@ -284,6 +284,7 @@ public class SaveAsHTMLCommand implements Command {
 		String result = "";
 		while (scanner.hasNextLine()) {
 		  String line = scanner.nextLine();
+		  
 		  result += cmd(line) + "\n";
 			for (Map.Entry me : LatexHTML.entrySet()) {
 				  result = result.replace(me.getKey().toString(), me.getValue().toString());
@@ -291,7 +292,7 @@ public class SaveAsHTMLCommand implements Command {
 		}
 		if(isLetter) {
 			Date date = new Date();
-			result = "<html>\n<p class='letter' style='float: right'>"+letterSignerAddress+"\n<br>" + date.toString() + "</p>\n<br>\n<br>" + letterDestination + result;
+			result = "<html>\n<p class='letter' style='float: right'>"+letterSignerAddress+"\n<br>" + date.toString() + "</p>\n<br>\n<br>\n<p id='address'>" + letterDestination + "</p>" + result;
 		  }else {
 			  result = "<html>" + result;
 		  }
