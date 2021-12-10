@@ -49,7 +49,11 @@ public class HtmlToLatexParser {
 		HTMLLatex.put("<html>", "");
 		HTMLLatex.put("</html>", "");		
 		HTMLLatex.put("<h1>", "\\chapter{");
+		HTMLLatex.put("<h1 class='asterisk'>", "\\chapter*{");
 		HTMLLatex.put("<h2>", "\\section{");
+		HTMLLatex.put("<h2 class='asterisk'>", "\\section*{");
+		HTMLLatex.put("<h3 class='asterisk'>", "\\subsection*{");
+		HTMLLatex.put("<h4 class='asterisk'>", "\\subsubsection*{");
 		HTMLLatex.put("<td style='border:1px solid black;'>", " & ");
 		HTMLLatex.put("<td>", " & ");		
 		HTMLLatex.put("<h3>", "\\subsection{");
@@ -216,8 +220,11 @@ public class HtmlToLatexParser {
 					  }
 					  parsedLine = parsedLine.replaceAll("Chapter \\d+: \\\\n\\\\n ", "");
 					  parsedLine = parsedLine.replaceAll("\\\\section\\{\\d+ ", "\\\\section{");
+					  parsedLine = parsedLine.replaceAll("\\\\section\\*\\{\\d+ ", "\\\\section\\*{");
 					  parsedLine = parsedLine.replaceAll("\\\\subsection\\{[+-]?([0-9]*[.])?[0-9]+ ", "\\\\subsection{");
+					  parsedLine = parsedLine.replaceAll("\\\\subsection\\*\\{[+-]?([0-9]*[.])?[0-9]+ ", "\\\\subsection\\*{");
 					  parsedLine = parsedLine.replaceAll("\\\\subsubsection\\{[+-]?([0-9]*[.])([0-9]*[.])?[0-9]+ ", "\\\\subsubsection{");
+					  parsedLine = parsedLine.replaceAll("\\\\subsubsection\\*\\{[+-]?([0-9]*[.])([0-9]*[.])?[0-9]+ ", "\\\\subsubsection\\*{");
 					  
 					  Pattern regex = Pattern.compile("\\d+:\\d+:\\d+");
 						Matcher regexMatcher = regex.matcher(line);

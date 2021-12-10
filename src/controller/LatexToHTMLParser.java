@@ -17,6 +17,7 @@ public class LatexToHTMLParser {
 	private String letterSignature;
 	private String letterSignerAddress;
 	private boolean isLetter = false;
+	private boolean containsAsterisk = false;
 	private boolean readTable = false;
 	private String letterDestination;
 	private int subsubsectionCount = 1;
@@ -175,7 +176,18 @@ public class LatexToHTMLParser {
 						return result;
 					}
 					
+					if(FirstPart.contains("*")) {
+						containsAsterisk = true;
+					}
 					FirstPart = LatexHTML.get(FirstPart.replace("*", ""));
+					if(containsAsterisk) {
+						result = extra + SecondPart + closingTag(FirstPart) + ThirdPart;
+						FirstPart = FirstPart.substring(0,FirstPart.indexOf(">")) + " class='asterisk'>";
+						result = FirstPart + result;
+						containsAsterisk = false;
+						return result;
+					}
+					
 					result = FirstPart + extra + SecondPart + closingTag(FirstPart) + ThirdPart;
 				}else {
 					FirstPart = LatexHTML.get(FirstPart);
@@ -268,6 +280,7 @@ public class LatexToHTMLParser {
 		subsectionCount = 1;
 		subsubsectionCount = 1;
 		tableWithBorder = false;
+		containsAsterisk = false;
 		
 		Scanner scanner = new Scanner(documentContents);
 		String result = "";
