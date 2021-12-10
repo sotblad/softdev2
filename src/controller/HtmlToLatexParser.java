@@ -212,7 +212,7 @@ public class HtmlToLatexParser {
 					  }else if(parsedLine.contains("\\closing")) {
 						  senderNameNext = true;
 					  }else if(parsedLine.contains("<img src=")) {
-						  String image = parsedLine.substring(parsedLine.indexOf("'")+1,parsedLine.indexOf("jpg")+3);
+						  String image = parsedLine.substring(parsedLine.indexOf("'")+1,parsedLine.indexOf("width")-2);
 						  String width = parsedLine.substring(parsedLine.indexOf("width")+7,parsedLine.indexOf("px"));
 						  String height = parsedLine.substring(parsedLine.indexOf("height")+8);
 						  height = height.substring(0,height.indexOf("px"));
