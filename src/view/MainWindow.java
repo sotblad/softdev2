@@ -136,6 +136,12 @@ public class MainWindow {
 		mnFile.add(mntmloadAsLatex);
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.exit(0);
+				
+			}
+		});
 		mnFile.add(mntmExit);
 		
 		
