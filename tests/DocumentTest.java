@@ -12,13 +12,12 @@ import model.DocumentManager;
 import model.VersionsManager;
 import model.strategies.VersionsStrategy;
 import model.strategies.VolatileVersionsStrategy;
-import view.LatexEditorView;
 
 class DocumentTest {
 	private DocumentManager documentManager = new DocumentManager();
 	private VersionsStrategy strategy = new VolatileVersionsStrategy();
-	private LatexEditorView latexEditorView = new LatexEditorView();
-	private VersionsManager versionsManager = new VersionsManager(strategy, latexEditorView);
+	private LatexEditorController latexEditorController = new LatexEditorController();
+	private VersionsManager versionsManager = new VersionsManager(strategy, latexEditorController);
 	private LatexEditorController controller = new LatexEditorController(versionsManager);
 	private Singleton app;
 	private String defaultStrategy = "volatile";
@@ -29,93 +28,93 @@ class DocumentTest {
 		document = new Document();
 		app = Singleton.getInstance(versionsManager, documentManager);
 		app.destroyInstance(); // method used only on tests.
-		latexEditorView.setCurrentDocument(document);
-		latexEditorView.setVersionsManager(versionsManager);
-		latexEditorView.setController(controller);
+		latexEditorController.setCurrentDocument(document);
+		latexEditorController.setVersionsManager(versionsManager);
+		latexEditorController.setController(controller);
 	}
 	
 	@Test
 	void createEmptyDocument() { // US-1 -- ✅
 		String template = "emptyTemplate";
-		latexEditorView.setType(template);
-		latexEditorView.getController().enact("create");
+		latexEditorController.setType(template);
+		latexEditorController.getController().enact("create");
 		
-		assertEquals(latexEditorView.getCurrentDocument().getContents(), "");
+		assertEquals(latexEditorController.getCurrentDocument().getContents(), "");
 	}
 	
 	@Test
 	void createDocumentFromTemplate() { // US-1 -- ✅
 		String template = "articleTemplate";
-		latexEditorView.setType(template);
-		latexEditorView.getController().enact("create");
+		latexEditorController.setType(template);
+		latexEditorController.getController().enact("create");
 		
-		assertEquals(latexEditorView.getCurrentDocument().getContents(), documentManager.getContents(template));
+		assertEquals(latexEditorController.getCurrentDocument().getContents(), documentManager.getContents(template));
 	}
 	
 	@Test
 	void editDocument() { // US-2 -- ✅
 		String template = "articleTemplate";
-		latexEditorView.setType(template);
-		latexEditorView.getController().enact("create");
+		latexEditorController.setType(template);
+		latexEditorController.getController().enact("create");
 		String textAfterEdit = documentManager.getContents(template) + "\nEdited new line.";
-		latexEditorView.setText(textAfterEdit);
-		latexEditorView.getController().enact("edit");
+		latexEditorController.setText(textAfterEdit);
+		latexEditorController.getController().enact("edit");
 
-		assertEquals(textAfterEdit, latexEditorView.getCurrentDocument().getContents());
+		assertEquals(textAfterEdit, latexEditorController.getCurrentDocument().getContents());
 	}
 	
 	@Test
 	void enableTrackingMechanism() { // US-4 -- ✅
-		latexEditorView.setStrategy(defaultStrategy);
-		latexEditorView.getController().enact("enableVersionsManagement");
+		latexEditorController.setStrategy(defaultStrategy);
+		latexEditorController.getController().enact("enableVersionsManagement");
 		
-		assertEquals(latexEditorView.getVersionsManager().isEnabled(), true);
+		assertEquals(latexEditorController.getVersionsManager().isEnabled(), true);
 	}
 	
 	@Test
 	void changeStorageStrategy() { // US-5 -- ✅
-		latexEditorView.setStrategy("stable");
-		latexEditorView.getController().enact("changeVersionsStrategy");
+		latexEditorController.setStrategy("stable");
+		latexEditorController.getController().enact("changeVersionsStrategy");
 		
-		latexEditorView.setStrategy("volatile");
-		latexEditorView.getController().enact("changeVersionsStrategy");
+		latexEditorController.setStrategy("volatile");
+		latexEditorController.getController().enact("changeVersionsStrategy");
 		
-		assertEquals(latexEditorView.getStrategy(), "volatile");
+		assertEquals(latexEditorController.getStrategy(), "volatile");
 	}
 	
 	@Test
 	void disableTrackingMechanism() { // US-6 -- ✅
-		latexEditorView.setStrategy(defaultStrategy);
-		latexEditorView.getController().enact("enableVersionsManagement");
-		latexEditorView.getController().enact("disableVersionsManagement");
+		latexEditorController.setStrategy(defaultStrategy);
+		latexEditorController.getController().enact("enableVersionsManagement");
+		latexEditorController.getController().enact("disableVersionsManagement");
 		
-		assertEquals(latexEditorView.getVersionsManager().isEnabled(), false);
+		assertEquals(latexEditorController.getVersionsManager().isEnabled(), false);
 	}
 	
 	@Test
 	void rollbackVersion() { // US-7 -- ✅
 		String template = "emptyTemplate";
-		latexEditorView.setType(template);
-		latexEditorView.setStrategy(defaultStrategy);
-		latexEditorView.getController().enact("enableVersionsManagement");
-		latexEditorView.getController().enact("create");
+		latexEditorController.setType(template);
+		latexEditorController.setStrategy(defaultStrategy);
+		latexEditorController.getController().enact("enableVersionsManagement");
+		latexEditorController.getController().enact("create");
 		
 		String version1 = "Version 1";
-		latexEditorView.setText(version1);		
-		latexEditorView.getController().enact("edit");
+		latexEditorController.setText(version1);		
+		latexEditorController.getController().enact("edit");
 		
 		String version2 = "Version 2";
-		latexEditorView.setText(version2);		
-		latexEditorView.getController().enact("edit");
+		latexEditorController.setText(version2);		
+		latexEditorController.getController().enact("edit");
 		
 		String version3 = "Version 3";
-		latexEditorView.setText(version3);		
-		latexEditorView.getController().enact("edit");
+		latexEditorController.setText(version3);		
+		latexEditorController.getController().enact("edit");
 		
-		latexEditorView.getController().enact("rollbackToPreviousVersion"); // rollback to v2
-		latexEditorView.getController().enact("rollbackToPreviousVersion"); // rollback to v1
+		latexEditorController.getController().enact("rollbackToPreviousVersion"); // rollback to v2
+		latexEditorController.getController().enact("rollbackToPreviousVersion"); // rollback to v1
 		
-		assertEquals(latexEditorView.getCurrentDocument().getVersionID(), "1");
+		assertEquals(latexEditorController.getCurrentDocument().getVersionID(), "1");
 	}
 	
 	@Test
@@ -123,10 +122,10 @@ class DocumentTest {
 		String template = "bookTemplate";
 		String docSavePath = "test.txt";
 		File file = new File(docSavePath);
-		latexEditorView.setType(template);
-		latexEditorView.getController().enact("create");
-		latexEditorView.setFilename(docSavePath);
-		latexEditorView.getController().enact("save");
+		latexEditorController.setType(template);
+		latexEditorController.getController().enact("create");
+		latexEditorController.setFilename(docSavePath);
+		latexEditorController.getController().enact("save");
 
 		assertTrue(file.exists());
 	}
@@ -135,12 +134,12 @@ class DocumentTest {
 	void loadDocumentFromDisk() { // US-9 -- ✅
 		String filePath = "test.txt";
 		File file = new File(filePath);
-		latexEditorView.setFilename(filePath);
+		latexEditorController.setFilename(filePath);
 		if(file.exists()) {
-			latexEditorView.getController().enact("load");
+			latexEditorController.getController().enact("load");
 		}
 		
-		assertNotNull(latexEditorView.getCurrentDocument().getContents());
+		assertNotNull(latexEditorController.getCurrentDocument().getContents());
 	}
 
 }
